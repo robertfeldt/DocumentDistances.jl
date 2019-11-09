@@ -13,7 +13,7 @@ This is primarily a julia package but can also be used from docker.
 For more on the Sinkhorn distance see:
 - [Original paper by Cuturi](https://arxiv.org/abs/1306.0895) on applying this to EMD: Cuturi (2013), "Sinkhorn Distances: Lightspeed Computation of Optimal Transportation Distances", NeurIPS.
 
-We use the excellent [SinkhornDistance.jl](https://github.com/currymj/SinkhornDistance.jl) by Michael J. curry for the Julia implementation.
+We use the excellent [SinkhornDistance.jl](https://github.com/currymj/SinkhornDistance.jl) by Michael J. Curry for the Julia implementation.
 
 The well-known paper that proposed to use the Earth Mover's Distance (EMD) as a document distance, i.e. Word Mover's Distance (WMD):
 - M. Kusner, Y. Sun, N. Kolkin, and K. Weinberger (2015), "[From word embeddings to document distances](http://www.jmlr.org/proceedings/papers/v37/kusnerb15.pdf)". In International Conference on Machine Learning, pp. 957-966.
