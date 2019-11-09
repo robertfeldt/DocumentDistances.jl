@@ -17,3 +17,5 @@ We use the excellent [SinkhornDistance.jl](https://github.com/currymj/SinkhornDi
 
 The well-known paper that proposed to use the Earth Mover's Distance (EMD) as a document distance, i.e. Word Mover's Distance (WMD):
 - M. Kusner, Y. Sun, N. Kolkin, and K. Weinberger (2015), "[From word embeddings to document distances](http://www.jmlr.org/proceedings/papers/v37/kusnerb15.pdf)". In International Conference on Machine Learning, pp. 957-966.
+
+For our word embeddings we use the excellent [Embeddings.jl](https://github.com/JuliaText/Embeddings.jl) by Lyndon White and the JuliaText team. 
