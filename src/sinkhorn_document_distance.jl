@@ -1,13 +1,9 @@
-using Embeddings
-using Distances
-using SinkhornDistance
-
 const EmbTableWord2Vec = load_embeddings(Word2Vec) # or load_embeddings(FastText_Text) or ...
-
 # Takes 54 sec to load! Maybe we should cache the word distances instead???
 #const EmbTableGloVe6B300d = load_embeddings(GloVe{:en}, 4)
 # Takes 33 sec to load
 #@time const EmbTableGloVe6B200d = load_embeddings(GloVe{:en}, 3)
+const DefaultEmbeddings = EmbTableWord2Vec
 
 vocabulary2indices(embtable) = Dict(word=>ii for (ii,word) in enumerate(embtable.vocab))
 
@@ -29,7 +25,7 @@ struct SinkhornDocumentDistance{E,D}
     worddistances::Dict{Tuple{String,String}, Float64} # We cache distances so we need to recalc them
 end
 
-function SinkhornDocumentDistance(e::E = EmbTableGloVe6B200d, d::D = Euclidean();
+function SinkhornDocumentDistance(e::E = DefaultEmbeddings, d::D = Euclidean();
     rounds = 100) where {D <: Distances.PreMetric, E <: Embeddings.EmbeddingTable}
 
     wordindex = vocabulary2indices(e)
