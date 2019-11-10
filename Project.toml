@@ -6,4 +6,6 @@ version = "0.1.0"
 [deps]
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 Embeddings = "c5bfea45-b7f1-5224-a596-15500f5db411"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 SinkhornDistance = "f54f004e-2c00-11e9-0a58-b3616241d5b6"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"

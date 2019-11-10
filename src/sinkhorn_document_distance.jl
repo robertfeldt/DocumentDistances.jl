@@ -1,51 +1,28 @@
-const EmbTableWord2Vec = load_embeddings(Word2Vec) # or load_embeddings(FastText_Text) or ...
-# Takes 54 sec to load! Maybe we should cache the word distances instead???
-#const EmbTableGloVe6B300d = load_embeddings(GloVe{:en}, 4)
-# Takes 33 sec to load
-#@time const EmbTableGloVe6B200d = load_embeddings(GloVe{:en}, 3)
-const DefaultEmbeddings = EmbTableWord2Vec
+using SparseArrays
 
-vocabulary2indices(embtable) = Dict(word=>ii for (ii,word) in enumerate(embtable.vocab))
+function marginals_from_doc(doc::Vector{String}, vocabulary::Vector{String};
+    usesparse = true)
 
-function marginals_from_doc(doc::Vector{String}, corpus::Vector{String})
-    N = length(corpus)
-    counts = zeros(Int, N)
+    N = length(vocabulary)
+    counts = usesparse ? spzeros(N) : zeros(Float64, N)
     for d in doc
-        idx = findfirst(wi -> d == corpus[wi], 1:N)
+        idx = findfirst(wi -> d == vocabulary[wi], 1:N)
         counts[idx] += 1
     end
     freqs = counts ./ sum(counts)
+    return freqs
 end
 
-struct SinkhornDocumentDistance{E,D}
+struct SinkhornDocumentDistance
+    usesparse::Bool # If we should use sparse calculations (of the marginals)
     rounds::Int
-    embtable::E
-    embeddingdistance::D
-    wordindex::Dict{String, Int}
-    worddistances::Dict{Tuple{String,String}, Float64} # We cache distances so we need to recalc them
+    worddistancecache::WordDistanceCache
 end
 
-function SinkhornDocumentDistance(e::E = DefaultEmbeddings, d::D = Euclidean();
-    rounds = 100) where {D <: Distances.PreMetric, E <: Embeddings.EmbeddingTable}
-
-    wordindex = vocabulary2indices(e)
-    worddistances = Dict{Tuple{String,String}, Float64}()
-    SinkhornDocumentDistance{E,D}(rounds, e, d, wordindex, worddistances)
-end
-
-function worddistance(sdd::SinkhornDocumentDistance, w1::String, w2::String)
-    get!(sdd.worddistances, (w1, w2)) do
-        calcworddistance(sdd, w1, w2)
-    end
-end
-
-function calcworddistance(sdd::SinkhornDocumentDistance, w1::String, w2::String)
-    evaluate(sdd.embeddingdistance, embedding(sdd, w1), embedding(sdd, w2)) 
-end
-
-function embedding(sdd::SinkhornDocumentDistance, w::String)
-    ind = sdd.wordindex[w]
-    return sdd.embtable.embeddings[:,ind]
+function SinkhornDocumentDistance(embeddingName::Symbol = :glove;
+    dir::String = ".", rounds::Int = 100, usesparse = true)
+    wdc = WordDistanceCache(dir, embeddingName)
+    SinkhornDocumentDistance(usesparse, rounds, wdc)
 end
 
 function distancematrix(sdd::SinkhornDocumentDistance, allwords::Vector{String})
@@ -55,7 +32,7 @@ function distancematrix(sdd::SinkhornDocumentDistance, allwords::Vector{String})
         w1 = allwords[i]
         for j in (i+1):N
             w2 = allwords[j]
-            dmatrix[i, j] = dmatrix[j, i] = worddistance(sdd, w1, w2)
+            dmatrix[i, j] = dmatrix[j, i] = worddistance(sdd.worddistancecache, w1, w2)
         end
     end
     return dmatrix
@@ -70,10 +47,8 @@ function calculate(sdd::SinkhornDocumentDistance, d1::Vector{String}, d2::Vector
     d2l = map(lowercase, d2)
     allwords = unique(vcat(d1l, d2l))
     dmatrix = distancematrix(sdd, allwords)
-    m1 = marginals_from_doc(d1l, allwords)
-    m2 = marginals_from_doc(d2l, allwords)
-    # We might want to use sparse vectors for the marginals but maybe not since we have a restricted corpus here which only are the words in these two docs.
-    #pl = sinkhorn_plan(dmatrix, sparsevec(m1), sparsevec(m2); rounds = rounds)
+    m1 = marginals_from_doc(d1l, allwords; usesparse = sdd.usesparse)
+    m2 = marginals_from_doc(d2l, allwords; usesparse = sdd.usesparse)
     pl = sinkhorn_plan(dmatrix, m1, m2; rounds = rounds)
     cost = sum(dmatrix .* pl)
     return cost, pl
