@@ -10,8 +10,11 @@ This is primarily a Julia package but can also be used as a binary directly from
 
 ## Installation
 
+Ensure you have added SinkhornDistance and then add DocumentDistances:
+
 ```julia
-using Pkg; Pkg.clone("https://github.com/robertfeldt/DocumentDistances.jl")
+]add https://github.com/currymj/SinkhornDistance.jl.git
+]add https://github.com/robertfeldt/DocumentDistances.jl
 ```
 
 from the Julia repl. 
@@ -20,7 +23,7 @@ Note that loading this package takes some time since it, in turn, loads the `Emb
 
 ## Usage
 
-Let's recreate the simple, illustrating example from the [paper](http://www.jmlr.org/proceedings/papers/v37/kusnerb15.pdf)" that introduced the Word Mover's Distance (WMD). We have two documents (here they are just short 4-word sentences) that are semantically similar but syntactically very different (since they have no words in common):
+Let's recreate the simple, illustrating example from the [paper](http://www.jmlr.org/proceedings/papers/v37/kusnerb15.pdf) that introduced the Word Mover's Distance (WMD). We have two documents (here they are just short 4-word sentences) that are semantically similar but syntactically very different (since they have no words in common):
 ```julia
 doc1 = ["obama", "speaks", "media", "illinois"]
 doc2 = ["president", "greets", "press", "chicago"]
