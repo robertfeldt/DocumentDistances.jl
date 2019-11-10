@@ -47,8 +47,8 @@ d23 = evaluate(sdd, doc2, doc3) # ~8.79 for me
 If we only want to calculate distances between individual words we can instead use a WordDistanceCache directly:
 ```julia
 wdc = WordDistanceCache()
-d1 = worddistance(wdc, "robert", "programmer") # ~1.34
-d2 = worddistance(wdc, "robert", "astronaut")  # ~1.42
+d1 = worddistance(wdc, "robert", "programmer") # ~8.31
+d2 = worddistance(wdc, "robert", "astronaut")  # ~8.96
 @assert d1 < d2 # Apparently Robert is closer to a programmer than an astronaut :)
 ```
 This cache can be saved to disk for speedier access to the same distances later (note that there is no loading of embeddings at this point):
@@ -56,6 +56,24 @@ This cache can be saved to disk for speedier access to the same distances later 
 save(wdc) # This is saved to ./.word_distances_cache.json as default but you can change this in the constructor
 wdc2 = WordDistanceCache("./.word_distances_cache.json")
 worddistance(wdc2, "robert", "programmer") == d1
+```
+There are many different embeddings that are currently included, to see a list of them:
+```julia
+julia> DocumentDistances.current_embeddings()
+8-element Array{Symbol,1}:
+ :glove42b300d
+ :glove6b300d
+ :glove
+ :word2vec
+ :glove6b100d
+ :glove6b50d
+ :glove840b300d
+ :glove6b200d
+```
+The `:glove6b300d` is the current default and should be a reasonable choice. It uses 300-dimensional embeddings and was trained on 6B of tokens. The largest (and best!?) one is `:glove840b300d` and was trained on 840B tokens but it takes longer time to load when you first use it and the files to download are over 2GiB.
+```julia
+wdclong = WordDistanceCache(".", :glove840b300d)
+@time worddistance(wdclong, "robert", "programmer")
 ```
 
 ## Background and relevant papers

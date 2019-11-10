@@ -134,7 +134,7 @@ function save(wdc::WordDistanceCache)
     open(fn, "w") do fh
         println(fh, json(wdc))
     end
-    println("Cached word distance cache to $fn")
+    println("Cached word distances to file $fn")
 end
 
 function load_word_distance_cache(cachefilepath::String)
