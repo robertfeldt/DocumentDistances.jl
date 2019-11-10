@@ -4,7 +4,7 @@
 vocabulary2indices(embtable) = Dict(word=>ii for (ii,word) in enumerate(embtable.vocab))
 
 const DefaultWordCacheFilename = ".word_distances_cache.json"
-const DefaultEmbeddingSystem = :word2vec
+const DefaultEmbeddingSystem = :glove
 const DefaultEmbeddingFilenumber = 1
 
 # We use our own mapping from embedding system names so users need not
@@ -26,6 +26,8 @@ const EmbeddingName2Embedding = Dict(
 )
 
 embeddingname2embedding(name) = lookup_embeddingname(Symbol(lowercase(string(name))))
+
+current_embeddings() = collect(keys(EmbeddingName2Embedding))
 
 function lookup_embeddingname(name::Symbol)
     try

@@ -5,7 +5,7 @@ println("Loading the Embeddings package. This takes some time...")
 using Embeddings
 
 export SinkhornDocumentDistance, evaluate
-export WordDistanceCache, embedding, worddistance
+export WordDistanceCache, embedding, worddistance, save
 
 include("word_distance_cache.jl")
 include("sinkhorn_document_distance.jl")

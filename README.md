@@ -13,7 +13,7 @@ This is primarily a Julia package but can also be used as a binary directly from
 Ensure you have added SinkhornDistance and then add DocumentDistances:
 
 ```julia
-]add https://github.com/currymj/SinkhornDistance.jl.git
+]add https://github.com/currymj/SinkhornDistance.jl
 ]add https://github.com/robertfeldt/DocumentDistances.jl
 ```
 
