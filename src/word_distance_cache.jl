@@ -67,9 +67,12 @@ mutable struct WordDistanceCache
     end
 end
 
-function WordDistanceCache(cachefilepath::String)
-    isfile(cachefilepath) && return load_word_distance_cache(cachefilepath)
-    error("No cache file found at $fn")
+function WordDistanceCache(cachefilepath::String = joinpath(".", DefaultWordCacheFilename))
+    if isfile(cachefilepath)
+        load_word_distance_cache(cachefilepath)
+    else
+        WordDistanceCache(dirname(cachefilepath), DefaultEmbeddingSystem)
+    end
 end
 
 function load_embeddings!(wdc::WordDistanceCache)

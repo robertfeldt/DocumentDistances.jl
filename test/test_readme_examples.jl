@@ -19,4 +19,9 @@ d23 = evaluate(sdd, d2, d3)
 @test d12 < d13
 @test d12 < d23
 
+wdc = WordDistanceCache()
+d1 = worddistance(wdc, "robert", "programmer") # 
+d2 = worddistance(wdc, "robert", "astronaut")
+@test d1 < d2
+
 end

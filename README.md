@@ -14,7 +14,46 @@ This is primarily a Julia package but can also be used as a binary directly from
 using Pkg; Pkg.clone("https://github.com/robertfeldt/DocumentDistances.jl")
 ```
 
-from the Julia repl.
+from the Julia repl. 
+
+Note that loading this package takes some time since it, in turn, loads the `Embeddings` package (which takes 20-60 seconds to load, typically).
+
+## Usage
+
+Let's recreate the simple, illustrating example from the [paper](http://www.jmlr.org/proceedings/papers/v37/kusnerb15.pdf)" that introduced the Word Mover's Distance (WMD). We have two documents (here they are just short 4-word sentences) that are semantically similar but syntactically very different (since they have no words in common):
+```julia
+doc1 = ["obama", "speaks", "media", "illinois"]
+doc2 = ["president", "greets", "press", "chicago"]
+```
+To calculate their distance we create a distance and call evaluate on it:
+```julia
+using DocumentDistances
+sdd = SinkhornDocumentDistance()
+d12 = evaluate(sdd, doc1, doc2) # return WMD between documents, is ~6.71 when I test this
+```
+Note that the first time you call this it will take a long time to execute since it loads the word embeddings from disk (or potentially downloads them from the Internet which takes even longer).
+
+To see if the returned distance is reasonable let's compare to another document that we expect to be further from the two documents above:
+```julia
+doc3 = ["lawyer", "tanks", "car", "africa"]
+d13 = evaluate(sdd, doc1, doc3) # ~8.83 for me
+d23 = evaluate(sdd, doc2, doc3) # ~8.79 for me
+@assert d12 < d13
+@assert d12 < d23
+```
+If we only want to calculate distances between individual words we can instead use a WordDistanceCache directly:
+```julia
+wdc = WordDistanceCache()
+d1 = worddistance(wdc, "robert", "programmer") # ~1.34
+d2 = worddistance(wdc, "robert", "astronaut")  # ~1.42
+@assert d1 < d2 # Apparently Robert is closer to a programmer than an astronaut :)
+```
+This cache can be saved to disk for speedier access to the same distances later (note that there is no loading of embeddings at this point):
+```julia
+save(wdc) # This is saved to ./.word_distances_cache.json as default but you can change this in the constructor
+wdc2 = WordDistanceCache("./.word_distances_cache.json")
+worddistance(wdc2, "robert", "programmer") == d1
+```
 
 ## Background and relevant papers
 
