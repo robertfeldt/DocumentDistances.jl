@@ -1,14 +1,22 @@
 # DocumentDistances.jl
 
-Calculate distances (metrics) between documents based on word embeddings. 
+Calculate distances (metrics) between words and documents based on word embeddings.
 
-The basic approach is to use word embeddings and the Word Mover's Distance (WMD) to calculate distances between documents. Currently it uses [Sinkhorn distance](https://arxiv.org/abs/1306.0895) to approximate the optimal transport between documents. This is known to be an accurate approximation although it has
-quadratic computational compelxity. Thus, currently, this package might not be well suited
-for distance calculation for very long documents.
+The basic approach is to use word embeddings and the Word Mover's Distance (WMD) to calculate distances between documents. We first map the words in a document to their embeddings, can calculate word distances by using regular vector distances between the embeddings, and then use WMD to calculate the optimal transport plan to go from one document to the other.
 
-This is primarily a julia package but can also be used from docker.
+Currently we use [Sinkhorn distance](https://arxiv.org/abs/1306.0895) to approximate the optimal transport plan between documents. This is known to be an accurate approximation although it has quadratic computational compelxity. Thus, currently, this package might not be well suited for distance calculation for very long documents.
 
-## Related papers
+This is primarily a Julia package but can also be used as a binary directly from a Docker image.
+
+## Installation
+
+```julia
+using Pkg; Pkg.clone("https://github.com/robertfeldt/DocumentDistances.jl")
+```
+
+from the Julia repl.
+
+## Background and relevant papers
 
 For more on the Sinkhorn distance see:
 - [Original paper by Cuturi](https://arxiv.org/abs/1306.0895) on applying this to EMD: Cuturi (2013), "Sinkhorn Distances: Lightspeed Computation of Optimal Transportation Distances", NeurIPS.
