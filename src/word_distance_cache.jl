@@ -4,7 +4,7 @@
 vocabulary2indices(embtable) = Dict(word=>ii for (ii,word) in enumerate(embtable.vocab))
 
 const DefaultWordCacheFilename = ".word_distances_cache.json"
-const DefaultEmbeddingSystem = :glove
+const DefaultEmbeddingSystem = :word2vec
 const DefaultEmbeddingFilenumber = 1
 
 # We use our own mapping from embedding system names so users need not
@@ -75,6 +75,11 @@ function WordDistanceCache(cachefilepath::String = joinpath(".", DefaultWordCach
     else
         WordDistanceCache(dirname(cachefilepath), DefaultEmbeddingSystem)
     end
+end
+
+function hasembedding(wdc::WordDistanceCache, word::AbstractString)
+    wdc.embtable != nothing || load_embeddings!(wdc)
+    haskey(wdc.wordindex, string(word))
 end
 
 function load_embeddings!(wdc::WordDistanceCache)
