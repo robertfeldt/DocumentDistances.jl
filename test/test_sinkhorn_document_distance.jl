@@ -1,5 +1,5 @@
 using DocumentDistances: calc_marginal, frequencies_from_counts
-using DocumentDistances: make_vocabulary, update_vocabulary!
+using DocumentDistances: make_vocabulary, update_vocabulary!, calculate
 using SparseArrays: spzeros
 
 @testset "SinkhornDocumentDistance" begin
@@ -59,5 +59,22 @@ end # @testset "make_vocabulary and update_vocabulary!"
     m4 = calc_marginal(String[], ["a", "b", "c"])
     @test length(m4) == 3
 end # @testset "calc_marginal"
+
+@testset "calculate and evaluate on strings and docs" begin
+    D1 = ["obama", "speaks", "media", "illinois"]
+    D2 = ["president", "greets", "press", "chicago"]
+
+    sdd = SinkhornDocumentDistance()
+    cost12, plan12 = calculate(sdd, D1, D2)
+    d12 = evaluate(sdd, D1, D2)
+    @test d12 == cost12
+    @test size(plan12, 1) == 8
+    @test size(plan12, 2) == 8
+
+    s1 = join(D1, " ")
+    s2 = join(D2, " ")
+    d12b = evaluate(sdd, s1, s2)
+    @test d12b == d12
+end
 
 end # @testset "SinkhornDocumentDistance"

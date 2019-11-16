@@ -74,6 +74,7 @@ end
 
 # Redefine this for other types for which you want to be able to calculate Sinkhorn distance.
 words(d::Vector{T}) where {T<:AbstractString} = d
+words(d::AbstractString) = map(w -> String(strip(w)), split(d, " "))
 
 function marginals_and_vocabulary(sdd::SinkhornDocumentDistance, d1, d2)
     marginals_and_vocabulary(words(d1), words(d2); usesparse = sdd.usesparse)
