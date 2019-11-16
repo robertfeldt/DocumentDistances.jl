@@ -6,9 +6,10 @@ function makecountvector(vocabulary, usesparse = true)
     return (N, usesparse ? spzeros(Int, N) : zeros(Int, N))
 end
 
-function update_vocabulary!(vocab::AbstractDict{T,Int}, words::Vector{T}) where {T<:AbstractString}
+function update_vocabulary!(vocab::AbstractDict{T,Int}, words) where {T<:AbstractString}
     idx = length(vocab)
     for w in words
+        w = T(w)
         !haskey(vocab, w) && (vocab[w] = (idx += 1))
     end
     return vocab
@@ -16,6 +17,8 @@ end
 
 make_vocabulary(words::Vector{T}) where {T<:AbstractString} = 
     update_vocabulary!(Dict{T, Int}(), words)
+
+make_vocabulary() = Dict{String, Int}()
 
 function calc_marginal(doc::Vector{T}, vocabulary::AbstractDict{T, V}; usesparse = true) where {T<:AbstractString, V<:Integer}
     N, counts = makecountvector(vocabulary, usesparse)
@@ -47,6 +50,8 @@ struct SinkhornDocumentDistance
     worddistancecache::WordDistanceCache
 end
 
+worddistance(sdd::SinkhornDocumentDistance) = sdd.worddistancecache
+
 function SinkhornDocumentDistance(embeddingName::Symbol = :word2vec;
     dir::String = ".", rounds::Int = 100, usesparse = true)
     wdc = WordDistanceCache(dir, embeddingName)
@@ -76,14 +81,14 @@ end
 words(d::Vector{T}) where {T<:AbstractString} = d
 words(d::AbstractString) = map(w -> String(strip(w)), split(d, " "))
 
-function marginals_and_vocabulary(sdd::SinkhornDocumentDistance, d1, d2)
-    marginals_and_vocabulary(words(d1), words(d2); usesparse = sdd.usesparse)
+function marginals_and_vocabulary(d1, d2; usesparse = true)
+    marginals_and_vocabulary(words(d1), words(d2); usesparse = usesparse)
 end
 
 # Calculate the document distance between two documents, represented as vectors of strings.
 # Returns the distance, i.e. the cost of transport from one to the other, and the plan with transfer values.
 function calculate(sdd::SinkhornDocumentDistance, d1, d2)
-    m1, m2, vocab = marginals_and_vocabulary(sdd, d1, d2)
+    m1, m2, vocab = marginals_and_vocabulary(d1, d2; usesparse = sdd.usesparse)
     return cost_and_plan(sdd, m1, m2, vocab)
 end
 

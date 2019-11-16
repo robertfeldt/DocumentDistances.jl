@@ -11,3 +11,8 @@ end
 
 import Distances.evaluate
 evaluate(wmd::WordMoversDistance, d1, d2) = evaluate(wmd.sdist, d1, d2)
+
+hasembedding(dd::AbstractDocumentDistance, word::AbstractString) =
+    hasembedding(worddistance(dd), word)
+
+worddistance(wmd::WordMoversDistance) = worddistance(wmd.sdist)
