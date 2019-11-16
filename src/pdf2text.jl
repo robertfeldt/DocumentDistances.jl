@@ -53,16 +53,19 @@ isnewer(filepath1, filepath2) = stat(filepath1).mtime > stat(filepath2).mtime
 
 # Convert all pdf files in a dir to txt files. Iff recursive we traverse also into subdirs and
 # iff onlyifnew we only convert if there is not already a text file with the same name
-# which is older than the pdf file.
+# which is older than the pdf file. Returns the paths to all text files.
 function convert_pdf_files_to_txt(dirname::String; recursive = true, onlyifnew = true)
     count = converted = 0
+    alltextfiles = String[]
     walkfilesmatching(dirname, r".*\.pdf$"; recursive = recursive) do pdffilepath
         count += 1
         txtfilepath = withtxtext(pdffilepath)
+        push!(alltextfiles, txtfilepath)
         if onlyifnew == false || !isfile(txtfilepath) || isnewer(pdffilepath, txtfilepath)
             converted += 1
             pdf2text_apache_tika(pdffilepath)
         end
     end
     println("Found $count pdf files and converted $converted of them.")
+    return alltextfiles
 end
