@@ -1,5 +1,8 @@
 using DocumentDistances, Test
 
+using Random
+const NumRepeatedTests = 100
+
 @testset "DocumentDistances test suite" begin
 
 include("test_word_distance_cache.jl")
