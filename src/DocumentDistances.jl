@@ -6,6 +6,7 @@ using Embeddings
 
 export SinkhornDocumentDistance, evaluate
 export WordDistanceCache, embedding, worddistance, save
+export WordMoversDistance
 
 abstract type AbstractDocumentDistance <: SemiMetric end
 
@@ -14,7 +15,7 @@ include("sinkhorn_document_distance.jl")
 include("pdf2text.jl")
 include("textanalysis_interface.jl")
 include("word_movers_distance.jl")
-include("k_nearest_neighbours.jl")
+#include("k_nearest_neighbours.jl")
 
 function __init__()
     register_tika_app_jar_dependency()
